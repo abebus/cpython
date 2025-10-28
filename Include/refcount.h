@@ -248,7 +248,7 @@ PyAPI_FUNC(void) Py_DecRef(PyObject *);
 PyAPI_FUNC(void) _Py_IncRef(PyObject *);
 PyAPI_FUNC(void) _Py_DecRef(PyObject *);
 
-static inline Py_ALWAYS_INLINE void Py_INCREF(PyObject *op)
+static inline Py_ALWAYS_INLINE void _Py_HOT_FUNCTION Py_INCREF(PyObject *op)
 {
 #if defined(Py_LIMITED_API) && (Py_LIMITED_API+0 >= 0x030c0000 || defined(Py_REF_DEBUG))
     // Stable ABI implements Py_INCREF() as a function call on limited C API
@@ -323,7 +323,7 @@ PyAPI_FUNC(void) _Py_MergeZeroLocalRefcount(PyObject *);
 // version 3.12 and newer, and on Python built in debug mode. _Py_DecRef() was
 // added to Python 3.10.0a7, use Py_DecRef() on older Python versions.
 // Py_DecRef() accepts NULL whereas _Py_DecRef() doesn't.
-static inline void Py_DECREF(PyObject *op) {
+static inline void _Py_HOT_FUNCTION Py_DECREF(PyObject *op) {
 #  if Py_LIMITED_API+0 >= 0x030a00A7
     _Py_DecRef(op);
 #  else
@@ -333,7 +333,7 @@ static inline void Py_DECREF(PyObject *op) {
 #define Py_DECREF(op) Py_DECREF(_PyObject_CAST(op))
 
 #elif defined(Py_GIL_DISABLED) && defined(Py_REF_DEBUG)
-static inline void Py_DECREF(const char *filename, int lineno, PyObject *op)
+static inline void _Py_HOT_FUNCTION Py_DECREF(const char *filename, int lineno, PyObject *op)
 {
     uint32_t local = _Py_atomic_load_uint32_relaxed(&op->ob_ref_local);
     if (local == _Py_IMMORTAL_REFCNT_LOCAL) {
@@ -359,7 +359,7 @@ static inline void Py_DECREF(const char *filename, int lineno, PyObject *op)
 #define Py_DECREF(op) Py_DECREF(__FILE__, __LINE__, _PyObject_CAST(op))
 
 #elif defined(Py_GIL_DISABLED)
-static inline void Py_DECREF(PyObject *op)
+static inline void _Py_HOT_FUNCTION Py_DECREF(PyObject *op)
 {
     uint32_t local = _Py_atomic_load_uint32_relaxed(&op->ob_ref_local);
     if (local == _Py_IMMORTAL_REFCNT_LOCAL) {
@@ -382,7 +382,7 @@ static inline void Py_DECREF(PyObject *op)
 
 #elif defined(Py_REF_DEBUG)
 
-static inline void Py_DECREF(const char *filename, int lineno, PyObject *op)
+static inline void _Py_HOT_FUNCTION Py_DECREF(const char *filename, int lineno, PyObject *op)
 {
 #if SIZEOF_VOID_P > 4
     /* If an object has been freed, it will have a negative full refcnt
@@ -407,7 +407,7 @@ static inline void Py_DECREF(const char *filename, int lineno, PyObject *op)
 
 #else
 
-static inline Py_ALWAYS_INLINE void Py_DECREF(PyObject *op)
+static inline Py_ALWAYS_INLINE void _Py_HOT_FUNCTION Py_DECREF(PyObject *op)
 {
     // Non-limited C API and limited C API for Python 3.9 and older access
     // directly PyObject.ob_refcnt.

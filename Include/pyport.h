@@ -332,7 +332,8 @@ extern "C" {
  * suite to find these functions.
  */
 #if defined(__GNUC__) \
-    && ((__GNUC__ >= 5) || (__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
+    && ((__GNUC__ >= 5) || (__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) \
+    || defined(__clang__)
 #define _Py_HOT_FUNCTION __attribute__((hot))
 #else
 #define _Py_HOT_FUNCTION
